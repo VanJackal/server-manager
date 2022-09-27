@@ -1,0 +1,8 @@
+*/Logging
+/node_modules
+# Project exclude paths
+/Bot/commands/Colours.js
+/Bot/commands/status.cmd.js
+/Bot/lib/power-interface/index.js
+/GameServiceManager/index.js
+/GameServiceManager/routes.js
