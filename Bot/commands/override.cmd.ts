@@ -44,6 +44,7 @@ export = {
                     {name: "Pulse", value:'pulse'},
                     {name: "Hold", value:'hold'}
                 )
+                .setRequired(true)
             )
         )
         .addSubcommand(subcommand => subcommand
@@ -52,10 +53,12 @@ export = {
             .addBooleanOption(option => option
                 .setName("enabled")
                 .setDescription("is enabled?")
+                .setRequired(true)
             )
             .addStringOption(option => option
                 .setName("service")
                 .setDescription(`service to override, '${GLOBAL_SRV}' for global setting`)
+                .setRequired(true)
             )
         ),
     async execute(interaction) {
