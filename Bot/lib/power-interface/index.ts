@@ -10,6 +10,10 @@ type HostStatus = {
     info:string
 }
 
+//units should be ms
+const DUR_HOLD = 10000;
+const DUR_PULSE = 500;
+
 async function getState():Promise<HostStatus> {
     logger.warn("Not Implemented - power-interface.getState")
     return {
@@ -18,8 +22,22 @@ async function getState():Promise<HostStatus> {
     }
 }
 
+async function pulsePower(){
+    return pressPowerButton(DUR_PULSE)
+}
+
+async function holdPower(){
+    return pressPowerButton(DUR_HOLD)
+}
+
+async function pressPowerButton(duration){
+    logger.warn("Not Implemented = power-interface.pressPowerButton")
+}
+
 export {
     HostState,
-    getState
+    getState,
+    pulsePower,
+    holdPower
 }
 
