@@ -53,7 +53,7 @@ const ServiceSchema = new Schema<IService>({
 
 })
 
-const Service = model<IService>('service', ServiceSchema)
+const Service = model<IService>('gameService', ServiceSchema)
 
 export {
     Service,
