@@ -1,4 +1,5 @@
 import express = require('express');
+import {Service, Host} from 'db'
 import {logger} from 'logging'
 
 const router = express.Router()
@@ -34,6 +35,32 @@ router.post('/state/:id', (req, res) => {
  */
 router.get('/', (req,res) => {
     res.status(200)
+    res.send()
+})
+
+router.post('/service', async (req,res) => {
+    logger.debug(`Creating new service with:\n\t${JSON.stringify(req.body)}`)
+    try {
+        const srv = await Service.create(req.body)
+        res.json(srv)
+        res.status(201)
+    } catch (e) {
+        logger.error(JSON.stringify(e))
+        res.status(400)
+    }
+    res.send()
+})
+
+router.post('/host', async (req,res) => {
+    logger.debug(`Creating new host with:\n\t${JSON.stringify(req.body)}`)
+    try {
+        const host = await Host.create(req.body)
+        res.status(201)
+        res.json(host)
+    } catch (e) {
+        logger.error(JSON.stringify(e))
+        res.status(400)
+    }
     res.send()
 })
 
