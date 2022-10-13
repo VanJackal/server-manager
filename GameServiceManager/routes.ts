@@ -4,13 +4,19 @@ import {logger} from 'logging'
 
 const router = express.Router()
 
+enum State {
+    Offline,
+    Online,
+    Unknown
+}
+
 type GenericRes = {
     warn?:string,
     error?:string
 }
 
 type Status = GenericRes & {
-    status:number,//0 = offline, 1 = online, 2 = unknown
+    status:State,
     message:string
 }
 
@@ -39,9 +45,24 @@ router.get('/', (req,res) => {
 })
 
 router.post('/service', async (req,res) => {
-    logger.debug(`Creating new service with:\n\t${JSON.stringify(req.body)}`)
+    logger.debug(`Attempting service creation with:\n\t${JSON.stringify(req.body)}`)
+    if(!req.body.serviceId) {
+        logger.warn("POST: /service called without serviceId")
+        res.status(400)
+        res.send()
+        return
+    }
+    const service = await Service.findOne({serviceId:req.body.serviceId})
+    if (service) {
+        logger.warn(`Attempted to create a service with duplicate id: ${req.body.serviceId}`)
+        res.status(409)
+        res.send()
+        return
+    }
+
     try {
         const srv = await Service.create(req.body)
+        logger.info(`New service created:\n\t${srv}`)
         res.json(srv)
         res.status(201)
     } catch (e) {
