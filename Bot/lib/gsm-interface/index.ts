@@ -1,5 +1,6 @@
 import {logger} from 'logging'
 const axios = require('axios')
+import {Service} from 'db'
 
 type Res = {
     warn?:string,
@@ -12,34 +13,45 @@ enum State {
 }
 type ServiceState = Res & {
     status:State,
-    message:string
+    message:string,
+    players:number
 }
 type Status = Res & {
     serviceName:string,
-    serviceID:string,
+    serviceId:string,
     description:string,
     status:State,
     info:string,
     players:number,
-    boot?:Date,
+    lastBoot?:Date,
     lastPlayer?:Date,
     shutdown?:Date,
     additional?:string//holds extra info (e.g. link to mod list)
 }
 
 //TODO add icon to the server
-async function getStatus(service:string):Promise<Status>{
+async function getStatus(service:string):Promise<Status | Res>{
     logger.debug(`Getting status for: ${service}`)
-    let {data, status} = await axios.get(`${process.env.SRV_ADDR}/status?srv=${service}`)
+    const serviceEntry = await Service.findOne({serviceId:service})
+    if (!serviceEntry){
+        return {
+            error:`Service with id \`${service}\` not found.`
+        }
+    }
+
+    const {data, status} = await axios.get(`${process.env.SRV_ADDR}/status?srv=${service}`)
     logger.trace(`Status data:\n\t${JSON.stringify(data)}`)
+
     return {
-        serviceID:service,
-        serviceName:"minecraft?",
-        description:"a minecraft server",
-        players:0,
+        serviceId:service,
+        serviceName:serviceEntry.name,
+        description:serviceEntry.description,
+        players:data.players,
         status:data.status,
         info: data.message,
-        lastPlayer: new Date(),
+        lastBoot: serviceEntry.lastBoot,
+        lastPlayer: serviceEntry.lastPlayer,
+        shutdown: serviceEntry.shutdown,
         warn:data.warn,
         error:data.error
     }
