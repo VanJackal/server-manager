@@ -46,17 +46,20 @@ export = {
                 return
             }
 
+            logger.debug(`Status in execute: ${JSON.stringify(status)}`)
+
             const embed = new EmbedBuilder()
                 .setColor(colourFromState(status.status))
-                .setTitle(status.serviceName)
-                .setDescription(status.description)
+                .setTitle(status.serviceName || "No Service Title")
+                .setDescription(status.description || "No Description")
                 .addFields(
-                    {name:'Status', value:status.info},
+                    {name:'Status', value:status.info || "Unknown"},
                     {name:"\u200B", value:"\u200B"},
                     {name:"Last Boot", value:status.boot?dateToTimestamp(status.boot):"Never"},
                     {name:"Player Last Seen", value:status.lastPlayer?dateToTimestamp(status.lastPlayer):"Never"},
                 )
                 .setAuthor({name:"ID: " + status.serviceID})
+            logger.trace("Status Embed Created")
 
             if (status.status === State.Online) {
                 embed.addFields(
@@ -68,6 +71,7 @@ export = {
             }
             embeds.push(embed)
             if (status.warn) {
+                logger.warn(status.warn)
                 embeds.push( new EmbedBuilder()
                     .setColor(Logs.WARN)
                     .addFields({name:"Warning", value:status.warn})
@@ -75,6 +79,7 @@ export = {
                 )
             }
             if (status.error) {
+                logger.error(status.error)
                 embeds.push( new EmbedBuilder()
                     .setColor(Logs.ERROR)
                     .addFields({name:"Error", value:status.error})
