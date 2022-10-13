@@ -48,28 +48,31 @@ export = {
 
             logger.debug(`Status in execute: ${JSON.stringify(status)}`)
 
-            const embed = new EmbedBuilder()
-                .setColor(colourFromState(status.status))
-                .setTitle(status.serviceName || "No Service Title")
-                .setDescription(status.description || "No Description")
-                .addFields(
-                    {name:'Status', value:status.info || "Unknown"},
-                    {name:"\u200B", value:"\u200B"},
-                    {name:"Last Boot", value:status.boot?dateToTimestamp(status.boot):"Never"},
-                    {name:"Player Last Seen", value:status.lastPlayer?dateToTimestamp(status.lastPlayer):"Never"},
-                )
-                .setAuthor({name:"ID: " + status.serviceID})
-            logger.trace("Status Embed Created")
+            if (status.serviceId){
+                const embed = new EmbedBuilder()
+                    .setColor(colourFromState(status.status))
+                    .setTitle(status.serviceName || "No Service Title")
+                    .setDescription(status.description || "No Description")
+                    .addFields(
+                        {name:'Status', value:status.info || "Unknown"},
+                        {name:"\u200B", value:"\u200B"},
+                        {name:"Last Boot", value:status.boot?dateToTimestamp(status.boot):"Never"},
+                        {name:"Player Last Seen", value:status.lastPlayer?dateToTimestamp(status.lastPlayer):"Never"},
+                    )
+                    .setAuthor({name:"ID: " + status.serviceID})
+                logger.trace("Status Embed Created")
 
-            if (status.status === State.Online) {
-                embed.addFields(
-                    {
-                        name:"Auto Shutdown",
-                        value:status.shutdown? dateToTimestamp(status.shutdown) : "Not Scheduled",
+                if (status.status === State.Online) {
+                    embed.addFields(
+                        {
+                            name:"Auto Shutdown",
+                            value:status.shutdown? dateToTimestamp(status.shutdown) : "Not Scheduled",
                         },
-                )
+                    )
+                }
+                embeds.push(embed)
             }
-            embeds.push(embed)
+
             if (status.warn) {
                 logger.warn(status.warn)
                 embeds.push( new EmbedBuilder()
