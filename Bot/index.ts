@@ -3,7 +3,8 @@ import * as fs from "fs";
 import * as path from "path";
 const {Client, Collection, GatewayIntentBits} = require('discord.js')
 import {logger} from 'logging'
-import {Routes} from "discord.js";
+import {EmbedBuilder, Routes} from "discord.js";
+import {Logs} from "./commands/Colours";
 
 const intents = [
     GatewayIntentBits.Guilds,
@@ -35,7 +36,10 @@ client.on('interactionCreate', async (interaction) => {
     } catch (error) {
         logger.error(error);
         logger.error(JSON.stringify(error))
-        await interaction.reply({content:"**ERROR:**\n" + error})
+        await interaction.reply({embeds:[new EmbedBuilder()
+                .setColor(Logs.ERROR)
+                .addFields({name:"Error", value:error})
+                .setTimestamp()]})
     }
 })
 
