@@ -1,4 +1,5 @@
 import {logger} from 'logging'
+const axios = require('axios')
 
 type Res = {
     warn?:string,
@@ -8,6 +9,10 @@ enum State {
     Offline,
     Online,
     Unknown
+}
+type ServiceState = Res & {
+    status:State,
+    message:string
 }
 type Status = Res & {
     serviceName:string,
@@ -24,16 +29,19 @@ type Status = Res & {
 
 //TODO add icon to the server
 async function getStatus(service:string):Promise<Status>{
-    logger.warn("Not Implemented - gsm-interface.getStatus")
+    logger.debug(`Getting status for: ${service}`)
+    let {data, status} = await axios.get(`${process.env.SRV_ADDR}/status?srv=${service}`)
+    logger.trace(`Status data:\n\t${JSON.stringify(data)}`)
     return {
         serviceID:service,
         serviceName:"minecraft?",
         description:"a minecraft server",
         players:0,
-        status:State.Offline,
-        info: "Service Offline",
+        status:data.status,
+        info: data.message,
         lastPlayer: new Date(),
-        warn:"not implemented"
+        warn:data.warn,
+        error:data.error
     }
 }
 
