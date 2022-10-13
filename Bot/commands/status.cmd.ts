@@ -62,12 +62,22 @@ export = {
                     .setAuthor({name:"ID: " + status.serviceID})
                 logger.trace("Status Embed Created")
 
+                if(status.additional){
+                    embed.addFields(
+                        {name:"Additional Info", value:status.additional}
+                    )
+                }
+
                 if (status.status === State.Online) {
                     embed.addFields(
                         {
                             name:"Auto Shutdown",
                             value:status.shutdown? dateToTimestamp(status.shutdown) : "Not Scheduled",
                         },
+                        {
+                            name:"Players",
+                            value:status.players || 0
+                        }
                     )
                 }
                 embeds.push(embed)

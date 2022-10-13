@@ -49,6 +49,7 @@ async function getStatus(service:string):Promise<Status | Res>{
         players:data.players,
         status:data.status,
         info: data.message,
+        additional: serviceEntry.additional,
         lastBoot: serviceEntry.lastBoot,
         lastPlayer: serviceEntry.lastPlayer,
         shutdown: serviceEntry.shutdown,
