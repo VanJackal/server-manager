@@ -3,6 +3,7 @@ import {getStatus, State} from "gsm-interface";
 import {Status,Logs} from "./Colours";
 import {logger} from 'logging'
 import {HostState, getState} from "power-interface"
+import {addEmbed} from "./util";
 
 function colourFromState(state:State) {
     switch (state) {
@@ -83,22 +84,7 @@ export = {
                 embeds.push(embed)
             }
 
-            if (status.warn) {
-                logger.warn(status.warn)
-                embeds.push( new EmbedBuilder()
-                    .setColor(Logs.WARN)
-                    .addFields({name:"Warning", value:status.warn})
-                    .setTimestamp()
-                )
-            }
-            if (status.error) {
-                logger.error(status.error)
-                embeds.push( new EmbedBuilder()
-                    .setColor(Logs.ERROR)
-                    .addFields({name:"Error", value:status.error})
-                    .setTimestamp()
-                )
-            }
+            addEmbed(status, embeds)
             await interaction.reply({embeds:embeds});
         } else {
             const hostState = await getState()
