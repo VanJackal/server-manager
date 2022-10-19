@@ -1,5 +1,8 @@
-import {Interaction, SlashCommandBuilder} from "discord.js";
+import {EmbedBuilder, Interaction, SlashCommandBuilder} from "discord.js";
 import {setState} from 'gsm-interface'
+import {addEmbed} from "./util";
+
+const COLOR = "#82da82"
 
 
 export = {
@@ -27,15 +30,26 @@ export = {
         ,
     async execute(interaction) {
         const service = interaction.options.getString("service");
+        let embeds = []
+        let embed = new EmbedBuilder()
+            .setColor(COLOR)
+            .setTimestamp()
+        let res;
         switch (interaction.options.getSubcommand()){
             case "start":
-                await setState(service, true)
-                await interaction.reply(`Started ${service}`)
+                res = await setState(service, true)
+                embed.addFields({name:"/service",value:`started ${service}`})
                 break;
             case "stop":
-                await setState(service, false)
-                await interaction.reply(`Stopping ${service}`)
+                res = await setState(service, false)
+                embed.addFields({name:"/service",value:`stopped ${service}`})
                 break;
         }
+        if (res.warn||res.error) {
+            addEmbed(res, embeds);
+        } else {
+            embeds.push(embed)
+        }
+        await interaction.reply({embeds:embeds})
     }
 }
