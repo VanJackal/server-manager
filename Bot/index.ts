@@ -1,4 +1,3 @@
-import Discord = require('discord.js')
 import * as fs from "fs";
 import * as path from "path";
 const {Client, Collection, GatewayIntentBits} = require('discord.js')
@@ -36,10 +35,11 @@ client.on('interactionCreate', async (interaction) => {
     } catch (error) {
         logger.error(error);
         logger.error(JSON.stringify(error))
-        await interaction.reply({embeds:[new EmbedBuilder()
-                .setColor(Logs.ERROR)
-                .addFields({name:"Error", value:error})
-                .setTimestamp()]})
+        const embed = new EmbedBuilder()
+            .setColor(Logs.ERROR)
+            .addFields({name:"Error", value:`Error in command execution, see log channel for details`})
+            .setTimestamp()
+        await interaction.reply({embeds:[embed]})
     }
 })
 
