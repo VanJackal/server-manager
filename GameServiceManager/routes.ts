@@ -1,6 +1,7 @@
 import express = require('express');
 import {Service, Host} from 'db'
 import {logger} from 'logging'
+import {getState,setState} from "./service-interface";
 
 const router = express.Router()
 
@@ -23,8 +24,16 @@ type Status = GenericRes & {
 /**
  * get the status of a service
  */
-router.get('/status', (req, res) => {
-    res.json({warn:`input query: ${JSON.stringify(req.query)}`})
+router.get('/status/:id', async (req, res) => {
+    logger.debug(`Getting status of ${req.params.id}`)
+    const service = req.params.id
+    if(!await Service.findOne({serviceId:service})) {
+        logger.warn(`Status of unknown service(${service}) requested`)
+        res.status(404).send()
+        return
+    }
+    const state = await getState(service)
+    res.json({state:state})
     res.status(200);
 })
 
