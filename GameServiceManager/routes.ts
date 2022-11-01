@@ -33,7 +33,10 @@ router.get('/status/:id', async (req, res) => {
         return
     }
     const state = await getState(service)
-    res.json({state:state})
+    res.json({
+        status:state,
+        message:state?"Online":"Offline"
+    })
     res.status(200);
 })
 

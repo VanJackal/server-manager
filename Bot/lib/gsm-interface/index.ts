@@ -39,7 +39,7 @@ async function getStatus(service:string):Promise<Status | Res>{
         }
     }
 
-    const {data, status} = await axios.get(`${process.env.SRV_ADDR}/status?srv=${service}`)
+    const {data, status} = await axios.get(`${process.env.SRV_ADDR}/status/${service}`)
     logger.trace(`Status data:\n\t${JSON.stringify(data)}`)
 
     return {
@@ -47,7 +47,7 @@ async function getStatus(service:string):Promise<Status | Res>{
         serviceName:serviceEntry.name,
         description:serviceEntry.description,
         players:data.players,
-        status:data.status,
+        status:data.status?State.Online:State.Offline,
         info: data.message,
         additional: serviceEntry.additional,
         lastBoot: serviceEntry.lastBoot,
@@ -60,7 +60,7 @@ async function getStatus(service:string):Promise<Status | Res>{
 
 async function setState(service:string, state:boolean):Promise<Res> {
     logger.debug(`Setting state of ${service} to \`${state?"online":"offline"}\``)
-    const {data, status} = await axios.post(`${process.env.SRV_ADDR}/state/${service}`,{onState:state},{validateStatus: (status) => {
+    const {data, status} = await axios.post(`${process.env.SRV_ADDR}/state/${service}`,{state:state},{validateStatus: (status) => {
         return status >= 200 && status < 300 || [404, 409].includes(status)
     }})
     switch (status) {

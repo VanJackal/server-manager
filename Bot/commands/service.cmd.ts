@@ -34,22 +34,28 @@ export = {
         let embed = new EmbedBuilder()
             .setColor(COLOR)
             .setTimestamp()
-        let res;
+        let resP;
+        const channel = interaction.channel;
         switch (interaction.options.getSubcommand()){
             case "start":
-                res = await setState(service, true)
+                resP = setState(service, true)
                 embed.addFields({name:"/service",value:`started ${service}`})
+                interaction.reply({content:`Starting ${service}`,ephemeral:true})
                 break;
             case "stop":
-                res = await setState(service, false)
+                resP = setState(service, false)
                 embed.addFields({name:"/service",value:`stopped ${service}`})
+                interaction.reply({content:`Stopping ${service}`,ephemeral:true})
                 break;
         }
+        embed.setFooter({text:`uid: ${interaction.member.id}`})
+        await channel.sendTyping();
+        const res = await resP
         if (res.warn||res.error) {
             addEmbed(res, embeds);
         } else {
             embeds.push(embed)
         }
-        await interaction.reply({embeds:embeds})
+        await channel.send({embeds:embeds});
     }
 }

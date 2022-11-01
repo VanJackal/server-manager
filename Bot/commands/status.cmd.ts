@@ -60,16 +60,18 @@ export = {
                         {name:"Last Boot", value:status.boot?dateToTimestamp(status.boot):"Never"},
                         {name:"Player Last Seen", value:status.lastPlayer?dateToTimestamp(status.lastPlayer):"Never"},
                     )
-                    .setAuthor({name:"ID: " + status.serviceID})
+                    .setAuthor({name:"ID: " + status.serviceId})
                 logger.trace("Status Embed Created")
 
                 if(status.additional){
+                    logger.trace("adding additional info")
                     embed.addFields(
                         {name:"Additional Info", value:status.additional}
                     )
                 }
 
                 if (status.status === State.Online) {
+                    logger.trace("adding online only status info")
                     embed.addFields(
                         {
                             name:"Auto Shutdown",
@@ -77,7 +79,7 @@ export = {
                         },
                         {
                             name:"Players",
-                            value:status.players || 0
+                            value:`${status.players}` || "0"
                         }
                     )
                 }
