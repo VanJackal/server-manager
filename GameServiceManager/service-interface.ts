@@ -22,22 +22,29 @@ export async function getExtendedState(service:string):Promise<string> {
 }
 
 export async function setState(service:string, state:boolean):Promise<void> {
+    logger.info(`Setting state of ${service} to ${state}`)
     const currentState = await getState(service)
     if (currentState == state) throw "Service state conflict exception";
-    return execAsync(`systemctl --user ${state?"start":"stop"} ${service}`)
+    await execAsync(`systemctl --user ${state?"start":"stop"} ${service}`)
+    logger.debug(`Set state of ${service}`)
 }
 
 async function execAsync(command:string):Promise<any>{
     return new Promise<any>((resolve, reject) => {
+        logger.trace("executing " + command)
         exec(command, (error, stdout, stderr) => {
             if(stdout){
                 resolve(stdout)
+                return
             } else if (error||stderr){
                 reject(error||stderr)
+                return
             }
             if (error||stderr) {
                 logger.error(JSON.stringify(error))
                 logger.error(JSON.stringify(stderr))
+            } else {
+                resolve(stdout)
             }
         })
     })

@@ -41,8 +41,23 @@ router.get('/status/:id', async (req, res) => {
  * send body {state:bool} and sets the service to that state
  * returns 409 if the service is already in that state
  */
-router.post('/state/:id', (req, res) => {
-    res.json({warn:`input service id: ${req.params.id}`})
+router.post('/state/:id', async (req, res) => {
+    logger.debug(`Setting state of ${req.params.id} to ${req.body.state}`)
+    const service = req.params.id
+    if(!await Service.findOne({serviceId:service})) {
+        logger.warn(`unknown service(${service}) in request`)
+        res.status(404).send()
+        return
+    }
+    if(await getState(service) == req.body.state){
+        res.status(409)
+        res.json({warn:`${service} is already in the ${req.body.state?"on":"off"} state`})
+        res.send()
+        return
+    }
+    await setState(service,req.body.state)
+    res.status(200)
+    res.send()
 })
 
 /**
