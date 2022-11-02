@@ -83,9 +83,21 @@ async function setState(service:string, state:boolean):Promise<Res> {
     }
 }
 
+async function isHostUp():Promise<boolean>{
+    logger.info("checking host state")
+    try{//if the request takes longer than 1s the server is not online
+        await axios.get(process.env.SRV_ADDR,{timeout:1000})
+        return true
+    } catch (e) {//todo switch this to an icmp request and add icmp event listener to the api
+        return false
+    }
+
+}
+
 export {
     setState,
     getStatus,
+    isHostUp,
     State,
     Res
 }

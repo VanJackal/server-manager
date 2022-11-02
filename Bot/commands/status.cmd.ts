@@ -1,8 +1,7 @@
 import {EmbedBuilder, SlashCommandBuilder} from "discord.js";
-import {getStatus, State} from "gsm-interface";
-import {Status,Logs} from "./Colours";
+import {getStatus, isHostUp, State} from "gsm-interface";
+import {Logs, Status} from "./Colours";
 import {logger} from 'logging'
-import {HostState, getState} from "power-interface"
 import {addEmbed} from "./util";
 
 function colourFromState(state:State) {
@@ -33,7 +32,8 @@ export = {
         ),
     async execute(interaction) {
         const service = interaction.options.getString('service')
-        if(service) {
+        const hostState = await isHostUp()
+        if(service && hostState) {
             let embeds = []
             let status
             try {
@@ -89,24 +89,13 @@ export = {
             addEmbed(status, embeds)
             await interaction.reply({embeds:embeds});
         } else {
-            const hostState = await getState()
-            let color;
-            switch (hostState.state) {
-                case HostState.OFFLINE:
-                    color = Status.OFFLINE
-                    break
-                case HostState.ONLINE:
-                    color = Status.ONLINE
-                    break
-                default:
-                    color = Status.OTHER
-            }
+            let color = hostState?Status.ONLINE:Status.OFFLINE;
             const embed = new EmbedBuilder()
                 .setColor(color)
                 .setTitle("Hades")
                 .setDescription("Multi Server Host")
                 .addFields(
-                    {name:"Host Status",value:hostState.info}
+                    {name:"Host Status",value:hostState?"online":"offline"}
                 )
             await interaction.reply({embeds:[embed]})
             //TODO add list of services and their statuses in this response

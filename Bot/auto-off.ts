@@ -1,5 +1,7 @@
 import {logger} from 'logging'
 
+const SRV_CHECK_INT = 1000 * 10 // service check interval time in seconds
+
 /**
  * postpone a service from auto off for duration days
  * @param service service to postpone
