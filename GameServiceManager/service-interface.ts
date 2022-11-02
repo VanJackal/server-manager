@@ -1,6 +1,7 @@
 //should use systemctl is-active [service] to check the state of the service
 import {exec} from 'child_process'
 import {logger} from 'logging'
+import {Service} from 'db'
 
 /**
  * get the state of the service with the id 'service'
@@ -27,6 +28,15 @@ export async function setState(service:string, state:boolean):Promise<void> {
     if (currentState == state) throw "Service state conflict exception";
     await execAsync(`systemctl --user ${state?"start":"stop"} ${service}`)
     logger.debug(`Set state of ${service}`)
+}
+
+export async function getPlayers(service:string):Promise<number>{
+    if(!await getState(service)) return 0;
+    logger.info(`getting number of players in ${service}`)
+    const cmd = (await Service.findOne({serviceId:service},{playersCmd:1})).playersCmd
+    const result = await execAsync(cmd)
+    logger.trace(`${service} has ${result} players online`)
+    return parseInt(result.trim())
 }
 
 async function execAsync(command:string):Promise<any>{

@@ -1,7 +1,7 @@
 import express = require('express');
 import {Service, Host} from 'db'
 import {logger} from 'logging'
-import {getState,setState} from "./service-interface";
+import {getState,setState, getPlayers} from "./service-interface";
 
 const router = express.Router()
 
@@ -33,9 +33,11 @@ router.get('/status/:id', async (req, res) => {
         return
     }
     const state = await getState(service)
+    const players = await getPlayers(service)
     res.json({
         status:state,
-        message:state?"Online":"Offline"
+        message:state?"Online":"Offline",
+        players:players
     })
     res.status(200);
 })

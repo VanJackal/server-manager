@@ -9,6 +9,7 @@ interface IService {
     lastPlayer?:Date,
     shutdown?:Date,
     autoOff:boolean,
+    playersCmd:string
 }
 
 const ServiceSchema = new Schema<IService>({
@@ -40,6 +41,10 @@ const ServiceSchema = new Schema<IService>({
         type:Boolean,
         required:true
     },
+    playersCmd:{
+        type:String,
+        required:true
+    }
 })
 
 const Service = model<IService>('gameService', ServiceSchema)
