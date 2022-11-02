@@ -39,7 +39,7 @@ export async function getPlayers(service:string):Promise<number>{
     logger.info(`getting number of players in ${service}`)
     const cmd = (await Service.findOne({serviceId:service},{playersCmd:1})).playersCmd
     const result = await execAsync(cmd)
-    logger.trace(`${service} has ${result} players online`)
+    logger.trace(`${service} has ${result.trim()} players online`)
     return parseInt(result.trim())
 }
 

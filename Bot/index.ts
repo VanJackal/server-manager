@@ -4,6 +4,7 @@ const {Client, Collection, GatewayIntentBits} = require('discord.js')
 import {logger} from 'logging'
 import {EmbedBuilder, Routes} from "discord.js";
 import {Logs} from "./commands/Colours";
+require("./auto-off")
 
 const intents = [
     GatewayIntentBits.Guilds,

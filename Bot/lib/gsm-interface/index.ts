@@ -42,6 +42,9 @@ async function getStatus(service:string):Promise<Status | Res>{
     const {data, status} = await axios.get(`${process.env.SRV_ADDR}/status/${service}`)
     logger.trace(`Status data:\n\t${JSON.stringify(data)}`)
     logger.trace(`Service Date:\n\t${JSON.stringify(serviceEntry)}`)
+    if (data.players>0){
+        Service.findOneAndUpdate({serviceId:service},{lastPlayer:Date.now()})
+    }
     return {
         serviceId:service,
         serviceName:serviceEntry.name,
@@ -51,7 +54,7 @@ async function getStatus(service:string):Promise<Status | Res>{
         info: data.message,
         additional: serviceEntry.additional,
         lastBoot: serviceEntry.lastBoot,
-        lastPlayer: serviceEntry.lastPlayer,
+        lastPlayer: data.players>0?new Date():serviceEntry.lastPlayer,
         shutdown: serviceEntry.shutdown,
         warn:data.warn,
         error:data.error
@@ -99,5 +102,6 @@ export {
     getStatus,
     isHostUp,
     State,
-    Res
+    Res,
+    Status
 }
