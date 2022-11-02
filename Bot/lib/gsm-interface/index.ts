@@ -41,7 +41,7 @@ async function getStatus(service:string):Promise<Status | Res>{
 
     const {data, status} = await axios.get(`${process.env.SRV_ADDR}/status/${service}`)
     logger.trace(`Status data:\n\t${JSON.stringify(data)}`)
-
+    logger.trace(`Service Date:\n\t${JSON.stringify(serviceEntry)}`)
     return {
         serviceId:service,
         serviceName:serviceEntry.name,

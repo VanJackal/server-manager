@@ -57,7 +57,7 @@ export = {
                     .addFields(
                         {name:'Status', value:status.info || "Unknown"},
                         {name:"\u200B", value:"\u200B"},
-                        {name:"Last Boot", value:status.boot?dateToTimestamp(status.boot):"Never"},
+                        {name:"Last Boot", value:status.lastBoot?dateToTimestamp(status.lastBoot):"Never"},
                         {name:"Player Last Seen", value:status.lastPlayer?dateToTimestamp(status.lastPlayer):"Never"},
                     )
                     .setAuthor({name:"ID: " + status.serviceId})

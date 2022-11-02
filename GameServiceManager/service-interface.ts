@@ -28,6 +28,10 @@ export async function setState(service:string, state:boolean):Promise<void> {
     if (currentState == state) throw "Service state conflict exception";
     await execAsync(`systemctl --user ${state?"start":"stop"} ${service}`)
     logger.debug(`Set state of ${service}`)
+
+    if (state){//if service is being set to online then this is the new lastboot
+        await Service.findOneAndUpdate({serviceId:service},{lastBoot:Date.now()})
+    }
 }
 
 export async function getPlayers(service:string):Promise<number>{
