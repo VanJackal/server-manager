@@ -29,6 +29,8 @@ type Status = Res & {
     additional?:string//holds extra info (e.g. link to mod list)
 }
 
+const MIN_ONLINE = 3600 * 1000 // 1 hr minimum uptime
+
 //TODO add icon to the server
 async function getStatus(service:string):Promise<Status | Res>{
     logger.debug(`Getting status for: ${service}`)
@@ -63,12 +65,26 @@ async function getStatus(service:string):Promise<Status | Res>{
 
 async function setState(service:string, state:boolean):Promise<Res> {
     logger.debug(`Setting state of ${service} to \`${state?"online":"offline"}\``)
+    let srvStatus;
+    try{
+       srvStatus = await getStatus(service)
+    } catch (e){
+        logger.error("Error in setState status check")
+        logger.error(e)
+    }
+    if(!state && srvStatus.players>0) {
+        return {error:"Cannot shutdown service while players are online.\nContact admin to override this."}
+    }
     const {data, status} = await axios.post(`${process.env.SRV_ADDR}/state/${service}`,{state:state},{validateStatus: (status) => {
         return status >= 200 && status < 300 || [404, 409].includes(status)
     }})
     switch (status) {
         case 200:
             logger.info(`[${service}] state set to ${state}`)
+            if(state){//service should stay online for a minimum time before auto-off
+                const shutdown = new Date(Date.now() + MIN_ONLINE);
+                await Service.findOneAndUpdate({serviceId:service},{shutdown:shutdown})
+            }
             return data
         case 404:
             logger.trace(`non existent service (${service}) called in setstate`)
