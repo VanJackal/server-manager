@@ -1,6 +1,7 @@
 import {logger} from 'logging'
 const axios = require('axios')
 import {Service} from 'db'
+import {pulsePower} from "../power-interface";
 
 type Res = {
     warn?:string,
@@ -30,6 +31,9 @@ type Status = Res & {
 }
 
 const MIN_ONLINE = 3600 * 1000 // 1 hr minimum uptime
+const POWER_COOLDOWN = 60 * 5 * 1000;
+const POWER_COUNT = 500
+let _powerOnCooldown = false;
 
 //TODO add icon to the server
 async function getStatus(service:string):Promise<Status | Res>{
@@ -65,6 +69,11 @@ async function getStatus(service:string):Promise<Status | Res>{
 
 async function setState(service:string, state:boolean):Promise<Res> {
     logger.debug(`Setting state of ${service} to \`${state?"online":"offline"}\``)
+
+    if(state && !await isHostUp()){
+        await startHost();
+    }
+
     let srvStatus;
     try{
        srvStatus = await getStatus(service)
@@ -106,11 +115,44 @@ async function isHostUp():Promise<boolean>{
     logger.info("checking host state")
     try{//if the request takes longer than 1s the server is not online
         await axios.get(process.env.SRV_ADDR,{timeout:1000})
+        logger.debug("host online")
         return true
     } catch (e) {//todo switch this to an icmp request and add icmp event listener to the api
+        logger.debug("host offline")
         return false
     }
 
+}
+
+async function startHost():Promise<void>{
+    if(_powerOnCooldown) return
+    _powerOnCooldown = true;
+    setTimeout(() => {//this function can only be called every POWER_COOLDOWN ms
+        _powerOnCooldown = false;
+    },POWER_COOLDOWN)
+
+    if(await isHostUp()){
+        logger.warn("Tried to power on while host was online")
+        return
+    }
+    logger.info("Starting host")
+    return new Promise(async (resolve, reject) => {
+        const timer = (ms) => {
+            return new Promise(res => setTimeout(res,ms))
+        }
+        await pulsePower()
+        let count = 0
+        while(!await isHostUp() && count < POWER_COUNT){
+            count++
+            logger.debug(`Host start timeout - ${count}`)
+            await timer(1000)//wait 1 sec before trying again
+        }
+        if(count >= POWER_COUNT){
+            reject("failed to start host")
+        } else {
+            resolve()
+        }
+    })
 }
 
 export {
