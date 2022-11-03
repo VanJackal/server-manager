@@ -40,7 +40,7 @@ client.on('interactionCreate', async (interaction) => {
             .setColor(Logs.ERROR)
             .addFields({name:"Error", value:`Error in command execution, see log channel for details`})
             .setTimestamp()
-        await interaction.reply({embeds:[embed]})
+        await interaction.channel.send({embeds:[embed]})
     }
 })
 
