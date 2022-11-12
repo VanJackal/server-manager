@@ -1,6 +1,6 @@
 import {logger} from 'logging'
 import {Service} from 'db'
-import {getStatus, setState, State, Status, isHostUp} from "gsm-interface";
+import {getStatus, setState, State, isHostUp, canShutdown} from "gsm-interface";
 import {pulsePower} from "power-interface";
 
 const SRV_CHECK_INT = 1000 * 900 // service check interval time in seconds (1000 * 900 = 15min)
@@ -22,6 +22,7 @@ async function updateServices(){
     let online = 0;
     for (const service of services){
         let status;
+        if(!service.autoOff) continue;
         try {
             status = await getStatus(service.serviceId)
         } catch (e){
@@ -55,7 +56,7 @@ async function updateServices(){
             logger.trace(`${service.serviceId} - no actions taken in update`)
         }
     }
-    if(online == 0) {//shutdown the host machine if no services are online
+    if(online == 0 && canShutdown()) {//shutdown the host machine if no services are online
         logger.info("Shutting down host machine")
         await pulsePower();
     }

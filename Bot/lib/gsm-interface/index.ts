@@ -34,6 +34,7 @@ const MIN_ONLINE = 3600 * 1000 // 1 hr minimum uptime
 const POWER_COOLDOWN = 60 * 5 * 1000;
 const POWER_COUNT = 500
 let _powerOnCooldown = false;
+let _lastBootTime:Date = null;
 
 //TODO add icon to the server
 async function getStatus(service:string):Promise<Status | Res>{
@@ -127,6 +128,7 @@ async function isHostUp():Promise<boolean>{
 async function startHost():Promise<void>{
     if(_powerOnCooldown) return
     _powerOnCooldown = true;
+    _lastBootTime = new Date();
     setTimeout(() => {//this function can only be called every POWER_COOLDOWN ms
         _powerOnCooldown = false;
     },POWER_COOLDOWN)
@@ -155,10 +157,15 @@ async function startHost():Promise<void>{
     })
 }
 
+function canShutdown():boolean{
+    return _lastBootTime.getTime() > Date.now() - MIN_ONLINE;
+}
+
 export {
     setState,
     getStatus,
     isHostUp,
+    canShutdown,
     State,
     Res,
     Status
