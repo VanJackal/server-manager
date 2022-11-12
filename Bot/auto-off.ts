@@ -34,28 +34,28 @@ async function updateServices(){
         if(!status.serviceId){
             logger.fatal(`updateService -- how the fuck`)
         } else if (status.status != State.Online) {
-            if (status.shutdown){
+            if (status.shutdown){//remove the shutdown time if the service is not online
                 logger.trace(`${service.serviceId} - removing shutdown time due to offline service`)
                 await removeShutdown(service.serviceId)
                 continue
             }
             logger.trace(`${service.serviceId} - no actions taken in update`)
-        } else if(status.shutdown && status.shutdown < new Date() && status.players<=0){
+        } else if(status.shutdown && status.shutdown < new Date() && status.players<=0){//shutdown if there are no players and the shutdown time has passed
             logger.trace(`${service.serviceId} - Automatic Shutdown`)
             await setState(service.serviceId,false)
             await removeShutdown(service.serviceId)
             online--
-        } else if(status.players <= 0 && !status.shutdown) {
+        } else if(status.players <= 0 && !status.shutdown) {//add a shutdown time if there isn't one and there are no players online
             logger.trace(`${service.serviceId} - new shutdown time added due to lack of players`)
             await postpone(service.serviceId, SHUTDOWN_TIME)
-        } else if(status.players > 0 && status.shutdown) {
+        } else if(status.players > 0 && status.shutdown) {//postpone shutdown if there are players online (not only postpones SHUTDOWN_TIME days from current time)
             logger.trace(`${service.serviceId} - shutdown time postponed`)
             await postpone(service.serviceId, SHUTDOWN_TIME)
         } else {
             logger.trace(`${service.serviceId} - no actions taken in update`)
         }
     }
-    if(online == 0) {
+    if(online == 0) {//shutdown the host machine if no services are online
         logger.info("Shutting down host machine")
         await pulsePower();
     }
