@@ -4,6 +4,7 @@ const {Client, Collection, GatewayIntentBits} = require('discord.js')
 import {logger} from 'logging'
 import {EmbedBuilder, Routes} from "discord.js";
 import {Logs} from "./commands/Colours";
+import {Service} from 'db'
 require("./auto-off")
 
 const intents = [
@@ -27,6 +28,7 @@ for (const file of commandFiles) {
 }
 
 client.on('interactionCreate', async (interaction) => {
+    if(interaction.isAutocomplete()) return
     const command = interaction.client.commands.get(interaction.commandName);
 
     if(!command) return;
@@ -41,6 +43,28 @@ client.on('interactionCreate', async (interaction) => {
             .addFields({name:"Error", value:`Error in command execution, see log channel for details`})
             .setTimestamp()
         await interaction.channel.send({embeds:[embed]})
+    }
+})
+
+
+let services;
+const servicesP = Service.find({},{serviceId:1}).then((res) => {
+    services = res.map((service) => {
+        return {name:service.serviceId, value:service.serviceId}
+    })
+    logger.info("Initialized service list")
+})
+
+client.on('interactionCreate', async (interaction) => {
+    if(!interaction.isAutocomplete()) return
+
+    const focusedOption = interaction.options.getFocused(true)
+    if(focusedOption.name === 'service') {
+        if(!services) await servicesP;
+        await interaction.respond(services.filter((choice) => {
+            return choice.name.startsWith(focusedOption.value)
+        }))
+
     }
 })
 

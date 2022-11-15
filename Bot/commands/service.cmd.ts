@@ -16,7 +16,8 @@ export = {
                 .addStringOption( option => option
                     .setName("service")
                     .setDescription("ID of the server you want to start.\nUse /status to the of ids")
-                    .setRequired(true))
+                    .setRequired(true)
+                    .setAutocomplete(true))
         )
         .addSubcommand(subcommand =>
             subcommand
@@ -25,7 +26,8 @@ export = {
                 .addStringOption(option => option
                     .setName("service")
                     .setDescription("ID of the server you want to start.\nUse /status to the of ids")
-                    .setRequired(true))
+                    .setRequired(true)
+                    .setAutocomplete(true))
         )
         ,
     async execute(interaction) {
