@@ -1,13 +1,10 @@
 {
-  "name": "server-manager",
-  "version": "1.0.0",
-  "description": "",
+  "name": "gsm-bot",
+  "version": "0.1",
+  "description": "gsm bot interface",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
-  "author": "",
+  "author": "VanJackal",
   "license": "",
   "dependencies": {
     "@types/rpi-gpio": "^2.1.1",

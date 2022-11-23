@@ -1,0 +1,22 @@
+{
+  "name": "gsm-api",
+  "version": "0.1",
+  "description": "service controller",
+  "main": "index.js",
+  "keywords": [],
+  "author": "VanJackal",
+  "license": "",
+  "dependencies": {
+    "@types/rpi-gpio": "^2.1.1",
+    "axios": "^1.1.2",
+    "date-and-time": "^2.4.1",
+    "discord.js": "^14.5.0",
+    "express": "^4.18.1",
+    "mongoose": "^6.6.2",
+    "rpi-gpio": "^2.1.7",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.22"
+  }
+}
