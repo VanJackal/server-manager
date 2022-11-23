@@ -1,6 +1,7 @@
 import {logger} from 'logging'
 let gpio;
 if (process.env.PROD){
+    logger.info("Loading Prod power-interface")
     gpio = require("rpi-gpio").promise;
 } else {
     gpio = null
