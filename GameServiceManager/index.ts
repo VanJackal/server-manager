@@ -27,7 +27,8 @@ app.use('/api/',router)
 
 app.use((err, req, res, next) => {
     logger.error(err);
-    next();
+    res.sendStatus(500);
+    //next();
 })
 
 app.listen(port, () => {

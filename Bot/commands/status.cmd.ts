@@ -29,6 +29,7 @@ export = {
             .setName("service")
             .setDescription("ID of the service to get the status of. Omit this for status of host.")
             .setRequired(false)
+            .setAutocomplete(true)
         ),
     async execute(interaction) {
         const service = interaction.options.getString('service')

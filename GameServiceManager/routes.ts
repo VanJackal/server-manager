@@ -73,6 +73,10 @@ router.get('/', (req,res) => {
     res.send()
 })
 
+router.get('/error', (req, res) => {
+    throw "Error: Error"
+})
+
 router.post('/service', async (req,res) => {
     logger.debug(`Attempting service creation with:\n\t${JSON.stringify(req.body)}`)
     if(!req.body.serviceId) {
