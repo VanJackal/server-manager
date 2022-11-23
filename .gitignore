@@ -6,3 +6,5 @@
 /Bot/lib/power-interface/index.js
 /GameServiceManager/index.js
 /GameServiceManager/routes.js
+
+*.js

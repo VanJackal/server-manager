@@ -1,8 +1,11 @@
 import {logger} from 'logging'
 let gpio;
+let power;
+const INTERFACE_PIN = 16;// GPIO 23 on RPi (number refers to physical position of the pin)
 if (process.env.PROD){
     logger.info("Loading Prod power-interface")
-    gpio = require("rpi-gpio").promise;
+    gpio = require("onoff").Gpio;
+    power = new gpio(INTERFACE_PIN,'out');
 } else {
     gpio = null
 }
@@ -21,12 +24,6 @@ type HostStatus = {
 //units should be ms
 const DUR_HOLD = 10000;
 const DUR_PULSE = 500;
-
-const INTERFACE_PIN = 16;// GPIO 23 on RPi (number refers to physical position of the pin)
-
-function init(){
-    gpio.setup(INTERFACE_PIN,gpio.DIR_OUT)
-}
 
 
 async function getState():Promise<HostStatus> {
@@ -52,20 +49,18 @@ async function pressPowerButton(duration):Promise<void>{
         return
     } else {
         return new Promise(async (resolve, reject) => {
-            await gpio.write(INTERFACE_PIN, true).catch((e) => {
-                reject(e)
-            })
-            setTimeout(() => {
-                gpio.write(INTERFACE_PIN,false).catch((e) => {
-                    reject(e)
-                })
+            await power.write(1)
+            setTimeout(async () => {
+                await power.write(0)
                 resolve()
             }, duration)
         })
     }
 }
 
-if(process.env.PROD) init()
+process.on('SIGINT', () => {
+    power.unexport();
+})
 
 export {
     HostState,
