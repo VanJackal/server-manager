@@ -43,7 +43,7 @@ async function holdPower(){
 }
 
 async function pressPowerButton(duration):Promise<void>{
-    logger.info(`Power pressed for ${duration}s`)
+    logger.info(`Power pressed for ${duration}ms`)
     if(!process.env.PROD){
         logger.warn("PROD env variable not set, no pins fired")
         return
